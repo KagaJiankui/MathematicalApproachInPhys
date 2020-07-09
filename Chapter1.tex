@@ -1,0 +1,167 @@
+\documentclass[UTF8]{ctexart}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{listings}
+\lstdefinestyle{lfonts}{
+  basicstyle   = \scriptsize\ttfamily,
+  stringstyle  = \color{purple},
+  keywordstyle = \color{blue!60!black}\bfseries,
+  commentstyle = \color{olive}\scshape,
+}
+\lstdefinestyle{lnumbers}{
+  numbers     = left,
+  numberstyle = \tiny,
+  numbersep   = 1em,
+  firstnumber = 1,
+  stepnumber  = 1,
+}
+\lstdefinestyle{llayout}{
+  breaklines       = true,
+  tabsize          = 2,
+  columns          = spacefixed,
+}
+\lstdefinestyle{lgeometry}{
+  xleftmargin      = 20pt,
+  xrightmargin     = 0pt,
+  frame            = tb,
+  framesep         = \fboxsep,
+  framexleftmargin = 20pt,
+}
+\lstdefinestyle{lgeneral}{
+  style = lfonts,
+  style = lnumbers,
+  style = llayout,
+  style = lgeometry,
+}
+\lstset{language = Python, style = lgeneral}
+\usepackage{markdown}
+\usepackage{geometry,amsmath,amssymb,theorem,caption}
+\newcommand{\dif}{\mathop{}\!\mathrm{d}}
+\newcommand{\tr}{\mathop{}\!\mathrm{T}}
+\markdownSetup{fencedCode = true,hybrid=true}
+\begin{document}
+\begin{titlepage}
+  \title{数学物理方法笔记}
+
+\author{仇琨元}
+\date{2020.5.30}
+\maketitle
+\end{titlepage}
+
+本笔记是一份“拾遗补缺”性质的笔记，因此许多知识点会被直接跳过，同时在某些知识点处又会有大量的冗余阐释。
+使用时请对照 《LECTURE NOTES ON MATHEMATICAL METHODS》 阅读。
+\section{多元函数与多变量微积分}
+\subsection{函数相关性}
+对函数$u=u(x,y)$与$v=v(x,y)$，若存在$f(u,v)=0$，则称函数$u(x,y)$与$v(x,y)$存在相关性。
+对照线代课上对两个矢量线性相关的定义，可见函数相关性(functional dependence)就是
+线性相关性(linear dependence)在任意非线性空间中的推广，而线性相关性是把任意空间中
+的函数$u=u(x,y),v=v(x,y)$限定为了线性空间中的矢量$\vec{u}=(x_{1},y_{1})^{\tr}.\vec{v}=(x_{2},y_{2})^{\tr}$。
+
+对于更广泛地定义的n元函数$q_{1} (x_{1},\dots,x_{n})$，$\dots$，$q_{k} (x_{1},\dots,{x_{n}})$，函数相关性的定义仍然与线性相关性类似。
+换句话说，函数相关性和线性相关性的意义都是一些广义“矢量”在一定的组合$f(q_{1},q_{2},\dots,q_{k})$下能得到零，表明这些“矢量”在某个空间中“共面”。
+
+对于变元数为n的$n$维空间，其中的超平面维数为$n-1$，因此每个约束方程 $f_{i} (q_{1},q_{2},\dots,q_{k})=0$都使得这些“矢量”张成的空间维度降低1。
+
+判定连续函数在连续空间中是否存在相关性与判断线性空间中矢量的相关性方法类似，都是计算某个行列式是否为零。
+例如，对两个二元函数$u=u(x,y)，v=v(x,y)$，存在相关性时有$f(u,v)=0$，因而$\dif f=0$，
+\begin{eqnarray}
+\frac{\partial f}{\partial u}\frac{\partial u}{\partial x}+\frac{\partial f}{\partial v}\frac{\partial v}{\partial x}=0\\
+ \frac{\partial f}{\partial u}\frac{\partial u}{\partial y}+\frac{\partial f}{\partial v}\frac{\partial v}{\partial y}=0
+\end{eqnarray}
+将上式写为矩阵形式得
+\begin{equation}
+    \left(\begin{array}{cc}
+        \frac{\partial u}{\partial x} & \frac{\partial v}{\partial x}\\
+        \frac{\partial u}{\partial y} & \frac{\partial v}{\partial y}
+    \end{array}\right)
+    \left(\begin{array}{c}
+        \frac{\partial f}{\partial u}\\
+        \frac{\partial f}{\partial v}
+    \end{array}\right)
+    =
+    \left(\begin{array}{c}
+        0 \\ 0
+    \end{array}\right).
+\end{equation}
+该齐次方程左边的矩阵便是雅可比矩阵\textbf{J}，同时也是曲线坐标系$span_{\mathbb{U}}(u,v)$中的切矢量变换矩阵。
+当$u,v$存在相关性$f$时，对于任意非常值函数$f(u,v)$，该齐次方程应当有非零解，因此
+\begin{equation}
+    \det{\textbf{J}}=
+    \begin{vmatrix}
+        \frac{\partial u}{\partial x} & \frac{\partial v}{\partial x}\\
+        \frac{\partial u}{\partial x} & \frac{\partial v}{\partial y}
+    \end{vmatrix}
+    =0
+\end{equation}
+两个或多个函数$u_{1},\dots,u_{n}$存在函数相关性时，列展开雅可比矩阵有
+\begin{equation}
+  \begin{pmatrix}
+    \frac{\partial u}{\partial x} \\ \frac{\partial u}{\partial y}
+  \end{pmatrix}+
+  \lambda\begin{pmatrix}
+    \frac{\partial v}{\partial x} \\ \frac{\partial v}{\partial y}
+  \end{pmatrix}=0,\lambda \in \mathbb{R}
+\end{equation}
+即两个函数在每一点的切矢量线性相关（共线）。
+
+\textbf{对比：隐函数求导与函数相关性}
+
+对n维空间中的n对变量$X=(x_{1},x_{2},\dots,x_{n})^{\tr}$、$Q=(q_{1},q_{2},\dots,q_{n})^{\tr}$，在隐函数求导时约束曲面的形式为
+包含n对2n个变元的方程$f_{i}(X,Q)=0$。写出方形的雅可比矩阵需要n个约束方程（约束曲面），否则雅可比矩阵就不是方阵。而在判定
+变元是否存在函数相关性时，只需要一个任意的约束曲面，而这个约束曲面$f_{i}(Q)=0$也只需要包含n个待判定的变元，不需要将自变量$X$
+囊括进去。
+
+两种算法采用的约束曲面差别巨大，但是都会用到雅可比矩阵。这是因为计算隐函数导数时必须构造完整的方程组解出每个导函数，
+相当于求解$T: \dif X\mapsto\dif Q$的坐标变换，而判定函数是否存在函数相关性时需要判断是否存在组合$f(Q)=0$，进而需要
+判断多个函数在每一点的切矢量是否线性相关，自然都会用到完全表征一点处所有切矢量性质的雅可比矩阵。
+\subsection{度规矩阵与坐标变换}
+在《Metrics and Erenfest Plate》的前几节中已经较为详细地阐述了雅可比矩阵和坐标变换的关系。
+雅可比矩阵确立了不同曲线上无限小切矢量的变换关系，对组成不同曲线坐标系的坐标线和不同曲线坐标系中的同一曲线，
+仍然可以利用雅可比矩阵在坐标系之间变换切矢量。
+\begin{equation}
+  \dif x^{i}=\frac{\partial x^i}{\partial \xi^{j}}\dif \xi^{j},\\
+  \begin{pmatrix}
+    \dif x^{1} \\ \dif x^{2} \\ \dots \\ \dif x^{n}
+  \end{pmatrix}
+  =
+  \textit{J}
+  \begin{pmatrix}
+    \dif \xi^{1} \\ \dif \xi^{2} \\ \dots \\ \dif \xi^{n}
+  \end{pmatrix}
+\end{equation}
+两个函数存在相关性、雅可比矩阵不满秩，表明这两个函数不是独立变量，无法作为曲线坐标系的两条独立坐标线，
+因而也无法用坐标变换变换到这两个函数上。
+
+在曲线坐标系中，梯度、散度和旋度等矢量微分运算受坐标线的影响，也会乘上雅可比矩阵或者雅可比矩阵的逆矩阵。
+例如对nabla算子$\nabla$，在直角坐标系$X$中，
+\begin{equation}
+  \nabla_{\textbf{x}}=(\frac{\partial}{\partial x^{1}},\dots,/\frac{\partial}{\partial x^{n}})^{\tr}
+\end{equation}
+在曲线坐标系$Q$中，每个偏导算符都展开为对每条坐标线的偏导，因而
+\begin{align} \label{*}
+  \dif x^{i}&=\frac{\partial x^i}{\partial \xi^{j}}\dif \xi^{j} \\
+  \nabla_{\textbf{x}}^{\tr}&=\nabla_{\boldsymbol{\xi}}^{\tr}\cdot\textbf{J} \\
+  \nabla_{\textbf{x}}&=\textbf{J}^{\tr}\cdot\nabla_{\boldsymbol{\xi}}
+\end{align}
+
+
+切矢量之间的变换关系由雅可比矩阵确定，线元之间的变换关系则由度规矩阵确定。由于线元的长度是标量，因此
+在坐标变换下线元的长度不会发生变化；几何公理服从广义协变性原理，因此计算线元长度的式子也不会随着坐标
+系变化而变化，一定是一个二次型。
+
+在直角坐标系中，线元$\dif \boldsymbol{s}$的模方为
+\begin{equation}
+  \left\|\dif \boldsymbol{s} \right\|^{2}=\dif \xi^{i}\dif \xi^{i}=\dif \xi^{i}I\dif \xi^{j}, \\
+  I=\delta_{ij} \Rightarrow \left\|\dif \boldsymbol{s} \right\|^{2}=\dif \xi^{i}\delta_{ij}\dif \xi^{j}
+\end{equation}
+通过坐标变换$T: \dif X\mapsto\dif Q=J$将$\dif \boldsymbol{s}$变换到曲线坐标系，可得
+\begin{equation}
+  \left\|\dif \boldsymbol{s} \right\|^{2}=(J\dif \xi^{i})^{\tr} (J\dif\xi^{i})=\dif \xi^{i}(J^{\tr}IJ)\dif \xi^{j} \\
+  G=J^{\tr}IJ=J^{\tr}J\Rightarrow \left\|\dif \boldsymbol{s} \right\|^{2}=\dif \xi^{i}G\dif \xi^{j}
+\end{equation}
+其中$G=J^{\tr}J$即为度规矩阵，这个矩阵必定是对称矩阵。将上式按照爱因斯坦求和约定改写为类似直角坐标系的形式，
+\begin{equation}
+  G=g_{ij}\Rightarrow\left\|\dif \boldsymbol{s} \right\|^{2}=\dif \xi^{i}g_{ij}\dif \xi^{j}
+\end{equation}
+
+\end{document}

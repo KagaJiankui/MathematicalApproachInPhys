@@ -1,0 +1,1096 @@
+\documentclass[UTF8]{ctexart}
+\usepackage{geometry,amsmath,amssymb,theorem,caption,extarrows}
+\usepackage{graphicx,xcolor,listings,geometry,booktabs}
+\usepackage{xeCJK,fontspec}
+\setCJKmainfont[BoldFont=方正小标宋简体,ItalicFont=楷体]{华文宋体}
+  \setCJKsansfont{黑体}%serif是有衬线字体sans serif无衬线字体。
+  %\setmonofont{CMU Typewriter Text} % 等寬字型
+  \XeTeXlinebreaklocale "zh"
+  \XeTeXlinebreakskip = 0pt plus 1pt minus 0.1pt
+\lstset{
+    basicstyle          =   \sffamily,          % 基本代码风格
+    keywordstyle        =   \bfseries,          % 关键字风格
+    commentstyle        =   \rmfamily\itshape,  % 注释的风格，斜体
+    stringstyle         =   \ttfamily,  % 字符串风格
+    flexiblecolumns,                % 别问为什么，加上这个
+    numbers             =   left,   % 行号的位置在左边
+    showspaces          =   false,  % 是否显示空格，显示了有点乱，所以不现实了
+    numberstyle         =   \zihao{-5}\ttfamily,    % 行号的样式，小五号，tt等宽字体
+    showstringspaces    =   false,
+    captionpos          =   t,      % 这段代码的名字所呈现的位置，t指的是top上面
+    frame               =   tb,   % 显示边框
+}
+
+\lstdefinestyle{Python}{
+    language        =   Python, % 语言选Python
+    basicstyle      =   \zihao{-5}\ttfamily,
+    numberstyle     =   \zihao{-5}\ttfamily,
+    keywordstyle    =   \color{blue},
+    keywordstyle    =   [2] \color{teal},
+    stringstyle     =   \color{magenta},
+    commentstyle    =   \color[HTML]{338AAF}\ttfamily,
+    breaklines      =   true,   % 自动换行，建议不要写太长的行
+    columns         =   fixed,  % 如果不加这一句，字间距就不固定，很丑，必须加
+    basewidth       =   0.5em,
+}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstdefinestyle{mathematica}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color[HTML]{338AAF}\ttfamily,
+    keywordstyle=\zihao{-5}\sffamily\bfseries\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\zihao{-5}\ttfamily,
+    breakatwhitespace=false,
+    breaklines=true,
+    basewidth=0.5em,
+    captionpos=b,
+    columns=fixed,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+\newcommand{\dif}{\mathop{}\!\mathrm{d}}
+\newcommand{\tr}{\mathop{}\!\mathrm{T}}
+\newcommand{\const}{\mathop{}\!\mathrm{const.}}
+%%%%%%%%%% Start TeXmacs macros
+\catcode`\<=\active \def<{
+\fontencoding{T1}\selectfont\symbol{60}\fontencoding{\encodingdefault}}
+\catcode`\>=\active \def>{
+\fontencoding{T1}\selectfont\symbol{62}\fontencoding{\encodingdefault}}
+\newcommand{\barsuchthat}{|}
+\newcommand{\divides}{\mathrel{|}}
+\newcommand{\mathd}{\mathrm{d}}
+\newcommand{\tmmathbf}[1]{\ensuremath{\boldsymbol{#1}}}
+\newcommand{\tmop}[1]{\ensuremath{\operatorname{#1}}}
+\newcommand{\tmtextbf}[1]{{\bfseries{#1}}}
+\newcommand{\tmtextit}[1]{{\itshape{#1}}}
+\newcommand{\splitline}{\noindent\rule[0.25\baselineskip]{\textwidth}{0.5pt}}
+\newcommand{\autographinsert}[1]{\includegraphics[
+  height=\dimexpr\pagegoal-\pagetotal-4\baselineskip\relax,width=\textwidth,
+  keepaspectratio]{#1}}
+  % NOTE: 插入图片如果出问题飘到下一页,请调整减掉的行数
+\newenvironment{tmcode}[1][]{\begin{lstlisting}[language=Mathematica,style=mathematica]}{\end{lstlisting}}
+\newtheorem{theorem}{定理}
+%%%%%%%%%% End TeXmacs macros
+\geometry{a4paper,left=1.8cm,right=1.8cm,top=1.5cm,bottom=1.5cm}
+\begin{document}
+
+\begin{titlepage}
+\title{\zihao{0}吴崇试数理方法}
+\author{仇琨元}
+\date{2020.6.16}
+\maketitle
+\end{titlepage}
+
+\section{复变函数的初步引入}
+
+\subsection{复数域上的无穷小分析引论}
+\tmtextbf{复变函数的极限与连续}
+
+分离实部和虚部可知，复变函数事实上是两个实变函数的有序组合：
+\[ f (z) = f (x, y) = u (x, y) + i v (x, y) \]
+因此，复变函数既可以看作$f : \mathbb{C}^1 \mapsto\mathbb{C}^1$，也可以看作$f : \mathbb{R}^2 \mapsto\mathbb{R}^2$。
+但是，在接下来的内容中，默认$y = iy$，因此对虚部求导会乘上一个虚数单位$i$。
+
+\begin{theorem}
+  对复变函数$f (z), z \in D$, 若存在复数$A$ s.t. $\forall \varepsilon > 0, \exists \delta (\varepsilon) > 0, | z - z_0 | < \delta \Rightarrow | f (z) - A | < \varepsilon$
+  , 则
+  \begin{equation}
+    \lim_{z \rightarrow z_0} f (z) = A
+  \end{equation}
+\end{theorem}
+
+与二元实变函数类似，由于复数存在实部与虚部，因此只有当复平面上任意方向任意路径的极限都收敛到$A$时，才能说复变函数$f$存在极限$A$。
+
+讨论无穷远点处函数的性质时，作变换$t = 1 /
+z$，然后讨论$f (t)$在$t = 0$点的性质。
+
+\tmtextbf{复变函数的导数与柯西-黎曼方程}
+
+通过上述定义，可以仿照实变函数的导数定义复变函数的导数$f'
+(z)$:
+
+\begin{theorem}
+  当$f (z), z \in D$是$D$上的单值函数时，
+  \begin{equation}
+    f' (z) = \lim_{\Delta z \rightarrow 0} \frac{f (z + \Delta z) - f
+    (z)}{\Delta z}
+  \end{equation}
+\end{theorem}
+
+同样只有当任意方向任意路径的导数都收敛到同一个值时，复变函数的导数才存在。这也就意味着，可以用二元实函数的可微性判断法则来判断复函数的可微性（解析性）。特别地，当$\Delta
+z$沿着坐标线方向趋于零时，可以得到不同坐标系下的导数存在必要条件，也就是柯西黎曼方程。以直角坐标系为例，$z
+= x + i y$，$\tmop{Re} (f) = u, \tmop{Im} (f) = v$,
+\begin{eqnarray}
+  \left(\begin{array}{c}
+    f' (z) \divides_{\Delta x \rightarrow 0}\\
+    f' (z) \barsuchthat_{\Delta y \rightarrow 0}
+  \end{array}\right) & = & \left(\begin{array}{c}
+    \frac{\partial u}{\partial x} + i \frac{\partial v}{\partial x}\\
+    - i \frac{\partial u}{\partial y} + \frac{\partial v}{\partial y}
+  \end{array}\right) \nonumber\\
+  \left(\begin{array}{cc}
+    1 & - 1
+  \end{array}\right) \left(\begin{array}{c}
+    f' (z) \divides_{\Delta x \rightarrow 0}\\
+    f' (z) \barsuchthat_{\Delta y \rightarrow 0}
+  \end{array}\right) & = & 0 \nonumber\\
+  \Rightarrow \frac{\partial u}{\partial x} & = & \frac{\partial v}{\partial
+  y}, \nonumber\\
+  \frac{\partial u}{\partial y} & = & - \frac{\partial v}{\partial x}
+\end{eqnarray}
+整理可得，
+\begin{eqnarray}
+  \frac{\partial f}{\partial x} & = & \frac{\partial u}{\partial x} + i
+  \frac{\partial v}{\partial x}, \nonumber\\
+  \frac{\partial f}{\partial \tmop{Im} (z)} & = & - i \frac{\partial
+  u}{\partial y} + \frac{\partial v}{\partial y} \\
+  (将 (3) 代入) \Rightarrow i \frac{\partial f}{\partial x} & = &
+  \frac{\partial f}{\partial y}
+\end{eqnarray}
+\begin{theorem}
+  （柯西-黎曼方程，必要条件）任意可导函数$f(z)$一定满足
+  \begin{equation}
+  \begin{array}{lll}
+    \frac{\partial u}{\partial x} & = & \frac{\partial v}{\partial y},
+  \end{array}
+  \begin{array}{lll}
+    \frac{\partial u}{\partial y} & = & - \frac{\partial v}{\partial x}
+  \end{array}
+  \end{equation}。
+\end{theorem}
+
+如果不满足柯西黎曼条件，那么至少存在两个方向该复变函数导数值不同，因此不存在导数。
+
+将复变函数看作$f : \mathbb{R}^2 \mapsto
+\mathbb{R}^2$，得到复变函数可微的充要条件：
+
+\begin{theorem}
+  （充分必要条件）若$\frac{\partial u}{\partial x}, \frac{\partial
+  u}{\partial y}, \frac{\partial v}{\partial x}, \frac{\partial v}{\partial
+  y}$全部连续且满足CR方程，那么$f (z)$一定可导。
+\end{theorem}
+
+由于复变函数的导数与实函数的导数定义形式上相同，都是一维到一维的映射，因此通过把复变函数看作$f: \mathbb{C}^1 \mapsto\mathbb{C}^1$
+，可以将各种实函数的求导公式搬到复函数中来，但是某些复函数的求导公式由于定义与实函数不同必须另外推算。
+
+利用CR公式将满足CR公式的复变函数导数变成一元实函数求导：
+\begin{eqnarray}
+  \mathd f & = & f' (z) \mathd z \nonumber\\
+  \Rightarrow \left( \frac{\partial u}{\partial x} \mathd x - i \frac{\partial
+  u}{\partial y} \mathd y + i \frac{\partial v}{\partial x} \mathd x +
+  \frac{\partial v}{\partial y} \mathd y \right) & = & f' (z) (\mathd x + i
+  \mathd y) \nonumber\\
+  \Rightarrow f' (z) & = & \frac{\partial u}{\partial x} + i \frac{\partial
+  v}{\partial x} = \frac{\partial f}{\partial x} \nonumber\\
+  & = & - i \frac{\partial u}{\partial y} + \frac{\partial v}{\partial y} = -
+  i \frac{\partial f}{\partial y}
+\end{eqnarray}
+事实上，可微复变函数在可微点的每个方向导数都等于这个复变函数在该点的导数。
+
+\subsection{解析函数与柯西-黎曼条件}
+
+\tmtextbf{解析函数}
+
+在区域$G$内每一点都可导的函数称为$G$上的解析函数。如果在某一点处函数没有定义、有定义但是不可导或者可导但是不解析，那么这个点是函数的\tmtextit{奇点}。显然，函数在$G$上解析的必要条件是处处满足CR方程。并且，CR方程对解析函数的实部和虚部施加了一个约束条件：
+
+例如已知实部$u (x, y)$，求虚部$v (x, y)$:
+\begin{eqnarray}
+  \mathd v & = & \frac{\partial v}{\partial x} \mathd x + \frac{\partial
+  v}{\partial y} \mathd y \nonumber\\
+  & = & - \frac{\partial u}{\partial y} \mathd x + \frac{\partial u}{\partial
+  x} \mathd y
+\end{eqnarray}
+(7)式是$u$的全微分，因此可以通过全微分求积解出$f$的虚部$v$。
+
+通过CR方程，我们可以得到解析函数的一些重要的几何性质与分析性质。如果在复平面上分别绘制实部和虚部的等值线并求切矢
+量，可知实部等值线$u
+(x, y) = C_1$的切矢量为$\tmmathbf{\tau}_u = \left( \frac{\partial
+u}{\partial y}, - \frac{\partial u}{\partial x}
+\right)^T$，同理虚部等值线$v (x, y) =
+C_2$的切矢量为$\tmmathbf{\tau}_v = \left( \frac{\partial v}{\partial y},
+- \frac{\partial v}{\partial x} \right)^T$。由CR方程，
+\begin{eqnarray}
+  \tmmathbf{\tau}_u \cdot \tmmathbf{\tau}_v & = & \left( \frac{\partial
+  u}{\partial y}, - \frac{\partial u}{\partial x} \right) \left(
+  \frac{\partial v}{\partial y}, - \frac{\partial v}{\partial x} \right)^T\\
+  & = & \left( \frac{\partial u}{\partial y}, - \frac{\partial u}{\partial x}
+  \right) \left( \frac{\partial u}{\partial x}, \frac{\partial u}{\partial y}
+  \right)^T\\
+  & = & 0
+\end{eqnarray}
+可见两组等值线相互正交。
+
+后面将(3.2节)证明解析函数实部虚部的二阶导数均连续，利用这个结论可以推知
+\begin{eqnarray}
+  \frac{\partial^2 u}{\partial x^2} & = & \frac{\partial}{\partial x}
+  \frac{\partial v}{\partial y} = \frac{\partial^2 v}{\partial x \partial
+  y},\\
+  \frac{\partial^2 u}{\partial y^2} & = & \frac{\partial}{\partial y} \left( -
+  \frac{\partial v}{\partial x} \right) = - \frac{\partial^2 v}{\partial x
+  \partial y}\\
+  \Rightarrow \nabla^2 u & = & 0,\\
+  同理 \nabla^2 v & = & 0.
+\end{eqnarray}
+\begin{theorem}
+  解析函数的实部虚部均为调和函数，且满足柯西黎曼方程：
+
+  \begin{center}
+    \begin{tabular}{|c|}
+      \hline
+      $\nabla^2 u = 0, \nabla^2 v = 0$\\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{theorem}
+
+利用信号与系统中的实部虚部分解
+\begin{equation}
+  \Re f(z)=\frac{f(z)+f(z)^{*}}{2},\Im f(z)=\frac{f(z)+f(z)^{*}}{2i}
+\end{equation}
+,我们可以形式上地证明(这意味着$x,y,z$都是没有特殊含义的变量名)
+\begin{theorem}
+  \begin{equation}
+    \forall f(z)\text{解析},\frac{\partial f(z)}{\partial z^{*}}=0
+  \end{equation}
+\end{theorem}
+\textbf{证明}
+
+对偏导算符进行实部虚部分解,
+\begin{equation}
+  \begin{aligned}[ht]
+    \text{令}\indent \frac{\partial}{\partial z}=&\frac{1}{2}(\frac{\partial}{\partial x}+\frac{\partial}{\partial iy})=\frac{1}{2}(\frac{\partial}{\partial x}-i\frac{\partial}{\partial y}) \\
+  \frac{\partial}{\partial z^{*}}=&\frac{1}{2i}(\frac{\partial}{\partial x}-\frac{\partial}{\partial iy})=\frac{1}{2}(\frac{\partial}{\partial x}+i\frac{\partial}{\partial y}) \\
+  f'(z)=\frac{\partial f}{\partial x}=\frac{\partial f}{\partial iy}\Rightarrow \frac{\partial f}{\partial z^{*}}=&\frac{1}{2i}(f'(z)-f'(z))=0
+  \end{aligned} \qquad
+\end{equation}
+同理可证
+\begin{equation}
+  \frac{\partial f^{*}(z)}{\partial z}=0
+\end{equation}
+因此,对以$f(x,y)=f(\Re (z),\Im (z))$形式表出的解析函数,当自变量$z$的虚部为零时$z=z^{*}=\Re (z)=x$,此时直接将$x=z,y=0$代入即可得到
+$f(z)$形式的解析函数.将实部虚部分解后的原函数(8)代入,有
+\begin{equation}
+  \begin{aligned}[ht]
+  u(x,y)=\Re f(x,y)=&\frac{1}{2}(f(z)+f^{*}(z)^{*}) \\
+  =&\frac{1}{2}(f(x+iy)+f^{*}(x-iy)) \\
+  \text{为方便起见,令}z^{*}=x-iy=0\Rightarrow&x=\frac{z}{2},y=\frac{z}{2i} \\
+  \Rightarrow u(\frac{z}{2},\frac{z}{2i})=&\frac{f(z)+f(0)}{2}
+  \end{aligned}
+\end{equation}
+上式直接给出了实部与复变函数本身的关系.由于通过积分确定复变函数时容许有一个纯虚数常数的偏差,因此可以假设$f(0)\in \mathbb{R}$,
+为方便起见直接令$f(0)=u(0,0)$:
+\begin{equation}
+  f(z)=2u(\frac{z}{2},\frac{z}{2i})-u(0,0)+iC
+\end{equation}
+
+\begin{lstlisting}[language=Mathematica,style=mathematica]
+CauchyRiemannJudge[r\_, i\_] :=
+Module[\{gr, gi, b1, b2\},
+(*输入实部虚部，判定函数是否满足柯西黎曼条件*)
+  gr = r;
+  Print["实部：" <> ToString[gr // StandardForm]];
+  gi = i;
+  Print["虚部：" <> ToString[gi // StandardForm]];
+  b1 = Boole[D[gr, x] - D[gi, y] == 0];b2 = Boole[D[gr, y] + D[gi, x] == 0];
+  Return[b1 == 1 \&\& b2 == 1]
+]
+CauchyRiemannJudge[r\_, i\_] :=
+Module[\{gr, gi, b1, b2, sol,der\},
+(*输入实部虚部，判定函数是否满足柯西黎曼条件*)
+  gr = r;
+  Print["实部：" <> ToString[gr // StandardForm]];
+  gi = i;
+  Print["虚部：" <> ToString[gi // StandardForm]];
+  b1 = Boole[D[gr, x] - D[gi, y] == 0];b2 = Boole[D[gr, y] + D[gi, x] == 0];
+  sol = Solve[\{D[gr, x] - D[gi, y] == 0, D[gr, y] + D[gi, x] == 0\}, \{x,y\}];
+  Print[
+    If[sol == \{Nothing\}, "全平面内不满足",
+      ToString[
+        Append[
+          sol[[1]], Evaluate[D[(gr + I*gi), x] /. sol[[1]]]] //StandardForm
+        ]
+      ]
+    ];
+ Return[b1 == 1 \&\& b2 == 1]
+]
+\end{lstlisting}
+
+\paragraph{1.}(1)
+\[ \| z \| = \sqrt{x^2 + y^2} \]
+\begin{lstlisting}[language=Mathematica,style=mathematica]
+  In[1]:CauchyRiemannJudge[(x^2 + y^2)^(1/2), 0]
+     Sqrt[x^2+y^2]
+     0
+Out[1]:Boole[x/Sqrt[x^2 + y^2] == 0]==1 && Boole[I*y/Sqrt[x^2 + y^2] == 0]==1
+\end{lstlisting}
+
+$\| z \|$在$\| z \| > 0$时不满足柯西黎曼条件，$\| z \| =
+0$时不可导，因此$\| z \|$全平面内不解析，因而不可导。
+
+(2)
+
+\begin{lstlisting}[language=Mathematica,style=mathematica]
+  In[2]:CauchyRiemannJudge[x, -y]
+     实部：x
+     虚部：-y
+Out[2]:False
+\end{lstlisting}
+
+$z^{\ast}$在全平面上不满足柯西黎曼条件，因此$z^{\ast}$全平面内不可导。
+
+(3)
+\begin{lstlisting}[language=Mathematica,style=mathematica]
+In[3]:CauchyRiemannJudge[x\^{}2, x y]
+实部：x\^{}2
+虚部：x y
+Out[3]:Boole[(2 - I) x == 0] == 1 \&\& Boole[I y == 0] == 1
+\end{lstlisting}
+
+
+当且仅当$x = y = 0$时，$z \tmop{Re}
+(z)$满足柯西黎曼条件，此时
+\[ f' (z) = \frac{\partial f}{\partial x} = 0 \]
+(4)
+\begin{lstlisting}[language=Mathematica,style=mathematica]
+In[4]:CauchyRiemannJudge[x\^{}2 + 2 y, x\^{}2 + y\^{}2]
+实部：x\^{}2+2 y
+虚部：-I(x\^{}2 + y\^{}2)
+Out[4]:Boole[2 x - 2 y == 0] == 1 \&\& Boole[2 + 2 x == 0] == 1
+\end{lstlisting}
+
+当且仅当$z = - 1 - i$时$(x^2 + 2 y) + i (x^2 +
+y^2)$满足柯西黎曼条件，此时
+\[ f' (z) = - 2 - 2 i \]
+(5)
+\begin{lstlisting}[language=Mathematica,style=mathematica]
+In[5]:CauchyRiemannJudge[3 x\^{}2, 2 y\^{}3]
+实部：3x\^{}2
+虚部：-2y\^{}3
+\{x->y\^{}2,6y\^{}2\}
+Out[5]:Boole[6 x - 6 y\^{}2 == 0] == 1
+\end{lstlisting}
+
+
+当且仅当$x = y^2$时$3 x^2 + 2 i y^3$满足柯西黎曼条件，此时
+\[ f' (z) = 6 y^2 \]
+(6)
+\begin{lstlisting}[language=Mathematica,style=mathematica]
+In[6]:CauchyRiemannJudge[(x - y)\^{}2, 2 (x + y)]
+实部：(x - y)\^{}2
+虚部：2 (x + y)
+\{y->-1+x,2+2 I\}
+Out[6]:Boole[x == 1 + y] == 1 \&\& Boole[x == 1 + y] == 1
+\end{lstlisting}
+
+
+当且仅当$y = x - 1$时$(x - y)^2 + 2 i (x +
+y)$满足柯西黎曼条件，此时
+\[ f' (z) = 2 + 2 i \]
+
+\paragraph{2.}
+
+\begin{eqnarray*}
+  \frac{\partial u}{\partial x} = \frac{\partial u}{\partial r} \frac{1}{\cos
+  \theta} & = & \frac{\partial v}{\partial \theta} \frac{\partial
+  \theta}{\partial y} = \frac{1}{r \cos \theta} \frac{\partial v}{\partial
+  \theta}\\
+  \Rightarrow \frac{\partial u}{\partial r} & = & \frac{1}{r} \frac{\partial
+  v}{\partial \theta},\\
+  \frac{\partial v}{\partial r} & = & - \frac{1}{r} \frac{\partial u}{\partial
+  \theta}
+\end{eqnarray*}
+
+\paragraph{3.}
+
+\begin{eqnarray*}
+  f' (z) & = & \frac{\partial u}{\partial x} + i \frac{\partial v}{\partial
+  x}\\
+  & = & \frac{\partial u}{\partial r} \frac{1}{\cos \theta} + i
+  \frac{\partial v}{\partial r} \frac{1}{\cos \theta}\\
+  & = & \frac{1}{\cos \theta} \left( \frac{\partial u}{\partial r} + i
+  \frac{\partial v}{\partial r} \right)\\
+  & = & \frac{r}{z} \left( \frac{\partial u}{\partial r} + i \frac{\partial
+  v}{\partial r} \right)\\
+  & = & \frac{1}{z} \left( - i \frac{\partial u}{\partial \theta} +
+  \frac{\partial v}{\partial \theta} \right)
+\end{eqnarray*}
+
+\paragraph{4.}
+
+(1)
+\begin{eqnarray*}
+  \mathd v & = & 2 y \mathd x + (1 + 2 x) \mathd y\\
+  \Rightarrow v & = & (1 + 2 x) y
+\end{eqnarray*}
+(2)
+\begin{eqnarray*}
+  \mathd v & = & \frac{2 xy}{(x^2 + y^2)^2} \mathd x + \frac{y^2 - x^2}{(x^2 +
+  y^2)^2} \mathd y\\
+  \Rightarrow v & = & \frac{1}{y} - \frac{2 y}{x^2 + y^2}
+\end{eqnarray*}
+
+\paragraph{6.}
+
+\begin{eqnarray*}
+  u - v & = & g (x, y)\\
+  \Rightarrow \frac{\partial u}{\partial x} - \frac{\partial v}{\partial x} =
+  \frac{\partial u}{\partial x} + \frac{\partial u}{\partial y} & = &
+  \frac{\partial g}{\partial x}\\
+  \frac{\partial u}{\partial y} - \frac{\partial v}{\partial y} =
+  \frac{\partial u}{\partial y} - \frac{\partial u}{\partial x} & = &
+  \frac{\partial g}{\partial y}\\
+  \Rightarrow \left(\begin{array}{c}
+    \frac{\partial u}{\partial x}\\
+    \frac{\partial u}{\partial y}
+  \end{array}\right) & = & \left(\begin{array}{c}
+    \frac{1}{2} \left( \frac{\partial g}{\partial x} - \frac{\partial
+    g}{\partial y} \right)\\
+    \frac{1}{2} \left( \frac{\partial g}{\partial x} + \frac{\partial
+    g}{\partial y} \right)
+  \end{array}\right)
+\end{eqnarray*}
+\subsection{单值函数与多值函数}
+
+单值函数是复数域上的单射，一个或多个自变量值对应同一个因变量值。整数指数幂、三角函数/双曲函数、指数函数都是单值函数
+。其中，指数函数以及指数函数的组合(三角函数，双曲函数)具有周期性，复指数函数的周期为$2\pi$，实指数函数的周期为
+$2 \pi i$。
+
+多值函数的每一个自变量对应至少两个因变量。分数指数幂、对数函数以及它们的组合(例如反三角函数)都是多值函数。
+
+\tmtextit{例子：根式函数}
+
+对
+\[ f (z) = (z - a)^{1 / 2} \]
+将复数的极坐标表达式代入，得到
+\begin{eqnarray*}
+  \rho e^{i \phi} & = & (r e^{i \theta})^{1 / 2}\\
+  \Rightarrow \rho & = & r^{1 / 2},\\
+  \phi & = & \frac{\theta + 2 n \pi}{2} = \frac{\theta}{2} + n \pi, n \in
+  \mathbb{Z}
+\end{eqnarray*}
+因此对于每个给定的$z$有两个$w = f (z)$与之对应：
+\begin{eqnarray*}
+  w_1 (z) & = & r^{1 / 2} e^{i \theta / 2}, n = 2 k\\
+  w_2 (z) & = & r^{1 / 2} e^{i (\theta / 2 + \pi)}, n = 2 k + 1
+\end{eqnarray*}
+这里，函数的多值性来自于宗量$z-a$辐角的多值性(更进一步说，是复指数幂的周期性)，因此会在因变量的辐角上表现出多值性。
+为了确定起见，我们将函数$w=\sqrt{z-a}$明确表示为模与辐角的形式：
+\begin{equation}
+  \begin{array}{cc}
+    |w|=\sqrt{|z-a|},\indent &\arg w=\frac{1}{2}\arg(z-a)
+  \end{array}
+\end{equation}
+每个不同的$w$值称作$w(x)$的一个单值分支。
+
+实变函数也有多值函数，例如同样的二次根式$w=\sqrt{x-a}$，在实数域中也有两个单值分支$w=+\sqrt{x-a}$与$w=-\sqrt{x-a}$，
+但这两个单值分支完全可以看作是独立的，也就是两个单值分支没有交点。但是对于复变函数，两个单值分支一般不会完全独立。
+
+讨论$z$沿简单闭合曲线连续变化的情况。如果曲线$C$内部不包含点$z=a$，那么$z$沿着$C$变化一周回到原处时，$z-a$的辐角也会
+复原，对应的函数值不变。而如果曲线内包含点$a$，那么$z$沿着$C$变化一周回到原处时$z-a$的辐角会增大$2\pi$，$\arg w$
+也增加$\pi$，因而$w$值会发生变化。同样，对于$z=\infty$的情形，当闭合曲线$C$足够大时，一定会把$a$点包含在内，因此
+$z$绕无穷远点一周时函数值也不会还原。可见，对于$z=a$与$z=\infty$这样的点，$z$的变化路径绕过这个点和不绕过这个点决
+定了$f(z)$所处的单值分支。
+
+为了确定多值函数的函数值与自变量值的关系(也就是确定单值分支)，而多值性的主要来源又是复指数函数的周期性，因此最简单
+的办法就是人为规定宗量的辐角范围。例如上面讨论的二次根式函数，当$\arg z-a$限制在某个范围，例如$\arg(z-a)\in \left[0,2\pi\right)$
+时，$w=(z-a)^{1/2}$的辐角自然唯一确定，因而$w$值也就唯一确定。
+
+  设$w=\sqrt{z-1}$，求$w(2),w(0),w(-i)$在单值分支$\arg (z-1)\in\left[0,2\pi\right)$上的值。
+  \begin{equation}
+    \begin{aligned}
+      [ht]
+      0\leqslant\arg (z-1)<2\pi\Rightarrow& \\
+    \arg(z-1)|_{z=2}=\arg 1=0,&\indent w(2)=1 \\
+    \arg(z-1)|_{z=0}=\arg i=\pi,&\indent w(0)=e^{i\pi/2}=i \\
+    \arg(z-1)|_{z=-i}=\arg(-i-1)=\frac{5}{4}\pi,&\indent w(-i)=\sqrt{\left\|-i-1 \right\| }e^{i5\pi/8} \\
+    &\indent\indent =\sqrt[4]{2}e^{i5\pi/8}
+    \end{aligned}
+  \end{equation}
+
+对于分数指数幂函数$f(x)=(x-a)^{k},k\in \mathbb{Q}$，$k$将整个平面切成了$\frac{1}{k}$份，每一份都存在一个一一对应的
+关系。还是以平方根为例，
+\begin{equation}
+  4k\pi\leqslant \arg(z-a)<2\pi+4k\pi\Rightarrow 2k\pi\leqslant w<(2k+1)\pi
+\end{equation}
+这样的限制将会使得$w$被限制在上半平面，而
+\begin{equation}
+  4k\pi+2\pi\leqslant \arg(z-a)<4(k+1)\pi\Rightarrow (2k+1)\pi\leqslant w<(2k+2)\pi
+\end{equation}
+则会使得$w$被限制在下半平面。这样看来，只要适当规定宗量的辐角变化范围，就可以将多值函数单值化，辐角变化的周期给
+出多值函数的各个单值分支，整个多值函数则是各个单值分支的总和。从几何上看，限制宗量的辐角范围事实上是限制$z$不得
+绕着枝点转圈。在$z$平面上平行于实轴向右作割线延伸至$\infty$，如果规定割线上岸$\arg(z-a)=0$，就给出单值分支I，如果
+规定割线上岸$\arg(z-a)=2\pi$，就给出单值分支II。
+
+但是，通过割裂宗量的辐角变化范围来划分单值分支不能用来讨论一些复杂的问题。为了克服这个缺点，我们可以采用另一种方式
+确定函数值和自变量值的对应关系：首先规定函数$w$在某一点$z_{0}$的值，然后明确说明$z$的连续变化路径。当$z$沿着这条给
+定的路径连续变化时，函数$w$也随之连续变化。
+
+还是以$w=\sqrt{z-1}$为例，规定$w(2)=1$，讨论$z$沿$C_{1}:(x-1)^2+y^2=1,x\geqslant0$与$C_{2}:(x-1)^2+y^2=1,x\leqslant0$
+连续变化到原点时的函数值。
+
+当$z$沿$C_{1}$移动到$z=0$时,$\Delta\arg(z-1)=\pi$,所以
+\begin{equation}
+  w(0)=\left\| z-1 \right\|e^{i\pi/2}=i
+\end{equation}
+当$z$沿$C_{2}$移动到$z=0$时,$\Delta\arg(z-1)=-\pi$,
+\begin{equation}
+  w(0)=e^{i(-\pi/2)}=-i
+\end{equation}
+采用这种办法,$z$的变化路线不受任何限制,因而可以从一个单值分支运动到另一个单值分支.在几何图形上,这相当于将第一种方法
+中割开的两个$z$平面粘接起来,第一个面的割线下岸与第二个面的割线上岸相连,第一个面的割线下岸和第二个面的割线上岸相连.
+这样连接起来的所有单值分支构成整个函数的取值面,叫做黎曼面,而每个单值分支叫做这个黎曼面的一叶.
+
+对根式函数,它的零点基本上就是枝点.
+
+\textit{使用mathematica可以画出}$\sqrt{z-1}$的黎曼面:
+\begin{lstlisting}[language=Mathematica,style=mathematica]
+  ResourceFunction["RiemannSurfacePlot3D"][w == Sqrt[z], Re[w], {z, w}]
+\end{lstlisting}
+\textbf{输出}
+
+\begin{figure}[htb]
+  \centering
+  \autographinsert{RiemannOfSqrt[z-1].eps}
+  \caption{$\sqrt{z-1}$的黎曼面}
+  \label{1}
+\end{figure}
+
+对于函数$w=\sqrt{z-a}$来说,由于这个函数有两个单值分支,因此它的黎曼面是二叶黎曼面,并且黎曼面上的每一个$z$点都和$w$
+平面上的点一一对应.如果是更复杂的根式函数,类似的讨论方法仍然适用,但是需要找出多值函数的全部枝点,并且正确地确定割线的
+作法.在一般情况下,割线不止一条,也不一定需要用一条割线连接所有枝点.
+
+\textit{对数函数}
+对数函数的定义是
+\begin{equation}
+  \exists w\in\mathbb{C} \text{s.t.} e^{w}=z \xlongequal[]{\text{def.}} w=\ln z
+\end{equation}
+,它是指数函数的反函数.因此,指数函数的周期性直接导致对数函数的多值性.令$w=u+iv,z=re^{i\theta}$,即得到
+\begin{equation}
+  e^{u}e^{iv}=re^{i\theta}\Rightarrow u=\ln \left\| z \right\|,v=\theta+2n\pi
+\end{equation}
+因而对数函数可以明确表示为
+\begin{equation}
+  w=\ln z+i(\arg z+2n\pi),\text{其中}\arg z\text{是辐角的主值}
+\end{equation}
+对应每一个$z$值有无穷多个$w$值,它们实部相同,虚部相差$2\pi$的整数倍.
+
+对数函数的宗量零点也是它的枝点. \\
+\textit{下列mathematica代码将复数域上的对数函数可视化:}
+\begin{lstlisting}[language=mathematica,style=mathematica]
+  plotcomplexlog[z_, m_] :=
+ Module[{zlog, REz, xZ, IMz, yZ, radii, pllabels, plotresult},
+  zlog = Log[Abs[z]] + I Arg[z];
+  REz = Re[zlog]; IMz[k_] := Im[zlog] + 2 k Pi;
+  xZ[t_] :=
+   Piecewise[{{t, 0 <= t <= Log[Abs[z]]}, {Log[Abs[z]],
+      t > Log[Abs[z]]}}];
+  yZ[t_, k_] :=
+   Piecewise[{{Tan[IMz[k]/REz]*t, 0 <= t <= Log[Abs[z]]}, {10 t,
+      t > Log[Abs[z]]}}];
+  pllabels =
+   Table["Arg[z]=\[Theta]+" <> ToString[2 k Pi] //
+     StandardForm, {k, -m, m}];
+  Print[pllabels];
+  plotresult = ParametricPlot[
+    Evaluate[Table[{xZ[t], yZ[t, k]}, {k, -m, m}]]
+    , {t, 0, REz + 1}, AspectRatio -> 1, PlotLabel -> z,
+    PlotLabels -> pllabels];
+  Return[Show[plotresult, ImageSize -> Medium]]
+  ]
+\end{lstlisting}
+\textbf{输出}
+
+\begin{figure}[htb]
+  \centering
+  \autographinsert{3+3ilog.eps}
+  \caption{$\ln 3+3i$的12个函数值}
+  \label{2}
+\end{figure}
+
+\paragraph{9.}~{}
+
+(1) \\
+\begin{equation}
+  re^{i\theta}=\sqrt{\left\| (z-a)(z-b) \right\|}e^{\frac{\theta_{1}+\theta_{2}}{2}}
+\end{equation}
+绕$z=a$或$z=b$旋转一周后,函数值变化$e^{i\pi}$,因此是枝点,同时绕$z=a$和$z=b$旋转一周后,函数值不发生变化,因此$z=\infty$
+不是枝点.
+(2)
+\begin{equation}
+  e^{i 3\theta}=e^{\arg(z-a)+2n_{1}/\pi+\arg(z-b)+2n_{2}}\Rightarrow\theta=\frac{\arg(z-a)+\arg(z-b)+2n_{1}/\pi+2n_{2}}{3}
+\end{equation}
+绕$z=a$或$z=b$旋转一周后,
+\begin{equation}
+  \Delta f(z)=\exp(\frac{2\pi}{3})=-\frac{1}{2}+\frac{i \sqrt{3}}{2}
+\end{equation}
+,绕$z=\infty$旋转一周后,
+\begin{equation}
+  \Delta f(z)=\exp(\frac{4\pi}{3})=-\frac{1}{2}-\frac{i \sqrt{3}}{2}\not=1
+\end{equation}
+因此$z=a,z=b$和$z=\infty$都是枝点.
+
+\paragraph{11.}~{} \\
+首先推导极坐标系的柯西黎曼方程:
+\begin{equation}
+  \begin{aligned}
+    [ht]
+    f(z)=&r(\rho,\phi)e^{i\theta\left(\rho,\phi\right)} \\
+  \Rightarrow \dif f(z)=&\dif\rho(\frac{\partial r}{\partial \rho}+i\left\|f(z) \right\| \frac{\partial \theta}{\partial \rho})e^{i\theta}+ \\
+  &\dif\phi(\frac{\partial r}{\partial \phi}+i\left\|f(z) \right\| \frac{\partial \theta}{\partial \phi})e^{i\theta} \\
+  =&f'(z)(\dif\rho+i \left\|z \right\| \dif\phi)e^{i\phi} \\
+  \Rightarrow \frac{\partial r}{\partial \rho}+i\left\|f(z) \right\| \frac{\partial \theta}{\partial \rho}=&f'(z)e^{i\left(\phi-\theta\right)} \\
+  -\frac{i}{\left\|z \right\| }\frac{\partial r}{\partial \phi}+\frac{\left\|f(z) \right\|}{\left\|z \right\| } \frac{\partial \theta}{\partial \phi}=&f'(z)e^{i\left(\phi-\theta\right)} \\
+\Rightarrow \frac{1}{r}\frac{\partial r}{\partial \rho}=&\frac{1}{\rho}\frac{\partial \theta}{\partial \phi} \\
+\rho\frac{\partial \theta}{\partial \rho}=&-\frac{1}{r}\frac{\partial r}{\partial \phi}
+  \end{aligned}
+\end{equation}
+将$\left\| f(z) \right\|=r=\mathrm{const.}$或$\arg f(z)=\theta =\mathrm{const.}$代入C-R方程,可知只要$f(z)$的模或辐角有一个
+是常数,那么$f(z)$实部、虚部的四个偏导数都必然为零,因而$f(z)=\mathrm{\const}$
+
+\section{解析函数的变换性质}
+\subsection{$\mathbb{C}^{1}$空间的真实结构}
+考虑以下问题:对$2\times2$矩阵$\mathbf{A}=\{\{a,b\},\{-b,a^{*}\}\}$,其中$\det \mathbf{A}=\left\| a \right\|^{2}+b^2=1$,
+求A的值. \\
+\textbf{解}
+
+设
+\begin{equation}
+  \det \mathbf{A}=\cos^{2} \alpha+\sin^{2} \alpha
+\end{equation}
+可得
+\begin{equation}
+  \begin{aligned}
+    [ht]
+    \det \mathbf{A}
+  &=\cos^{2} \alpha+\cos^{2} \beta\sin^{2} \alpha+\sin^{2} \beta\sin^{2} \alpha \\
+  &=\left\| \cos\alpha+i\sin \alpha\cos\beta \right\|^{2}+(\sin\beta\sin\alpha)^{2} \\
+  \Rightarrow\mathbf{A}&=\left(\begin{matrix}
+    \cos\alpha+i\sin \alpha\cos\beta&\sin\beta\sin\alpha \\
+    -\sin\beta\sin\alpha&\cos\alpha-i\sin \alpha\cos\beta \\
+  \end{matrix}\right)  \\
+  &=\cos\alpha\left(\begin{matrix}
+    1&0 \\ 0&1
+  \end{matrix}\right)
+  +\sin \alpha\left(\begin{matrix}
+    i \cos\beta&\sin\beta \\ -\sin\beta&-i \cos\beta
+  \end{matrix}\right)
+  \end{aligned}
+\end{equation}
+令
+\begin{equation}
+  \mathbf{I}_{2}=\mathrm{diag} \left(1,1\right),\mathbf{E}=\left(\begin{matrix}
+    i \cos\beta&\sin\beta \\ -\sin\beta&-i \cos\beta
+  \end{matrix}\right)
+\end{equation},
+简单计算可知
+\begin{equation}
+  I^{2}=I,E^{2}=-I,
+\end{equation}
+在$\mathbb{R}^{2\times 2}$空间中取线性独立基$\left\{I,E\right\}$张成子空间$\mathrm{Span}_{R}\left\{I,E\right\}$,
+可定义
+\begin{equation}
+  z=(I,E)\cdot(\Im(z),\Re(z))^{\tr}
+\end{equation}
+因而$\mathbb{C}^{1}$域是维数为2且具有一定结构,但是与$\mathbb{R}^{2\times 2}$上的二维子空间$\mathrm{Span}_{R}\left\{I,E\right\}$
+而非$\mathbb{R}^{2}$同构的线性希尔伯特空间.因为这个空间嵌套在$\mathbb{R}^{2\times 2}$中,而且具有$i^2+1=0$的结构,
+所以它的性质比$\mathbb{R}^{2}$好得多.其中最明显的一点,就是复数域对任意次数幂运算是代数闭的,但实数域不行.
+
+\subsection{保角变换与保拓扑变换}
+对连续复变函数$\zeta=f(z)$所代表的映射,z平面上的一点变换为$\zeta$平面上的一点,这一点的邻域$U(z)$内一点同样变换为$f(z)$点邻域内一点.
+但是,$z$点邻域与$f(z)$点邻域内点的对应关系并不一定是双射.对于$z$平面上的一个区域$A_{z}$,它经过$f(z)$作用后在$\zeta$平面上是否仍然是
+一个区域,区域的边界变换后是否仍然为边界、边界的取向是否相同,并非任意复变函数都可以保证做到的.例如函数$\zeta=\mathrm{Re}(z)$就把整个
+$z$平面变换为$\zeta$平面上的实轴,根本不构成一个区域.
+
+但是高等微分几何学给出,解析复变函数是$\mathbb{C}^{1}\mapsto\mathbb{C}^{1}$的共形变换,这也就意味着
+\begin{theorem}
+  对$\mathbb{C}^{1}:z\mapsto\mathbb{C}^{1}:\zeta$的解析函数$\zeta=f(z)$,$z$平面上的一个区域仍然变换为$\zeta$平面上的一个区域,区域$z$的
+  边界仍然为$\zeta$的边界,且边界方向不变.
+\end{theorem}
+
+因此,对于解析函数$\zeta=f(z)$,有
+\begin{equation}
+  \dif\zeta=f'(z)\dif z=f(z) \left(\frac{r'(z)}{\| f(z)\| }+i \theta '(z)\right)\dif z
+\end{equation}
+在$z_{0}$处有
+\begin{equation}
+  f'(z_{0})=\left\| f'(z_{0}) \right\|\arg f'(z_{0})
+\end{equation}
+当$f'(z_{0})\not=0$时,$f'(z_{0})$的模与辐角分别给出了$\dif\zeta$相比$\dif z$的伸缩率与偏转角.
+如果对于$l_{1},l_{2}\subset z,l_{1}',l_{2}'\subset \zeta$,由共形性质可知
+\begin{equation}
+  z_{0}=l_{1}\cap l_{2}\mapsto\zeta_{0}=l_{1}'\cap l_{2}'
+\end{equation}
+在$\zeta_{0}$点处计算两条曲线的导数:
+\begin{equation}
+  f'(z_{0})=\lim_{z\rightarrow z_{0}}\frac{f(z)-f(z_{0})}{z-z_{0}}
+\end{equation}
+由于$f'(z_{0})$的值无论是模还是辐角均与$z\rightarrow z_{0}$的方式无关,因此代入柯西黎曼条件计算可得
+\begin{equation}
+  \frac{\dif \Im (\zeta(t))}{\dif\Re (\zeta(t))}|_{\zeta_{0}}=\frac{\dif \Im (z(t))}{\dif\Re (z(t))}|_{z_{0}}
+\end{equation}
+,$l_{1}$到$l_{2}$的偏转角与$l_{1}'$到$l_{2}$的偏转角相同.换句话说,在解析函数代表的变换下,两条曲线的夹角保持不变.正是因为这个原因,
+解析函数代表的变换(映射)被称作\textbf{保角变换}(\textbf{保角映射}).在不同点处,只要$f'(z)$不为零,变换都具有保角性,但由于$f'(z)$的模与辐角
+随着$z$变化,因而各处的伸缩率和偏转角都不同,区域的几何形状也会发生变化.而在$f(z)=0$的点,变换的保角性由于$\arg f(z)$没有确定值而
+不复存在,因而在这一点处变换可能保角也可能不保角.
+
+\section{复变函数的积分}
+\subsection{$\mathbb{R}^{2}$上的观点}
+从$f : \mathbb{R}^2 \mapsto\mathbb{R}^2$的框架看,复变函数的积分可以表示为两个实变函数积分的有序组合
+\begin{equation}
+  \int_{L} f(z)\dif z=\int_{L}(u(x,y)+iv(x,y))\cdot\dif\mathbf{s}=\int_{L}(u\dif x-v\dif y)+i(v\dif x+u\dif y)
+\end{equation}
+这是一个典型的线积分.由实变函数的性质可知,当$C:f(x,y)$是分段光滑的曲线,$f(z)$是$\mathbb{C}$上的连续函数时,复变函数的积分
+一定存在.利用线积分求复变函数的积分并不要求被积函数必须是解析函数,只要实部虚部均黎曼可积就能求出积分,但这个积分也往往和
+路径有关.
+
+\textbf{算例}
+
+\begin{equation}
+  \int_{L}(\text{Re} z)\dif z,L:0\rightarrow 1\rightarrow 1+i
+\end{equation}
+\begin{align}
+  \label{8}
+  \int_{L}(\text{Re} z)\dif z=&\int_{L}x\dif x+ix\dif y \\
+  =&\frac{1}{2}+i
+\end{align}
+
+\subsection{单连通域上的柯西积分公式}
+考虑围道积分
+\begin{equation}
+  I=\oint_{L}f(z)\dif z=\oint_{L}(u\dif x-v\dif y)+i(v\dif x+u\dif y)
+\end{equation}
+当围道$L$是简单闭合曲线、区域$L$是单连通域时,可以用格林公式把这个围道积分变成对区域$L$的面积分
+\begin{equation}
+  \begin{aligned}
+    [ht]
+    I=&\iint_{L}\dif x\dif y \left(\left(i\frac{\partial u}{\partial x}-\frac{\partial v}{\partial x}\right)-\left(\frac{\partial u}{\partial y}+i\frac{\partial v}{\partial y}\right)\right) \\
+  =&\iint_{L}\dif x\dif y \left(i\left(\frac{\partial u}{\partial x}-\frac{\partial v}{\partial y}\right)-\left(\frac{\partial u}{\partial y}+\frac{\partial v}{\partial x}\right)\right) \\
+  \end{aligned}
+\end{equation}
+可见被积函数正好是柯西黎曼方程的形式.因此,当$f(z)$在$L$内解析时,代入柯西黎曼条件即可得到
+\begin{equation}
+  \begin{aligned}
+    [ht]
+    \frac{\partial u}{\partial x}-\frac{\partial v}{\partial y}=&0 \\
+  \frac{\partial u}{\partial y}+\frac{\partial v}{\partial x}=&0 \\
+  \Rightarrow \oint_{L}f(z)\dif z=&0
+  \end{aligned}
+\end{equation}
+\begin{theorem}[单连通域中的柯西定理]
+  对解析函数$f(z)$,$\forall \text{闭合}C\subset G\text{或}C=\partial G$分段光滑,均有
+  \begin{equation}
+    \oint_{L}f(z)\dif z=0
+  \end{equation}
+\end{theorem}
+由实变函数的知识可知,解析函数在单连通区域内的积分与路径无关!因此采取$f : \mathbb{C}^{1} \mapsto\mathbb{C}^{1}$的框架,
+我们可以将这个无关路径的积分值称作解析函数$f(z)$在$G$上的定积分
+\begin{equation}
+  \int_{z_{0}}^{z_{1}}f(z)\dif z
+\end{equation}
+,将以终点为自变量的的积分值函数
+\begin{equation}
+  F(z)=\int_{z_{0}}^{z} f(\zeta)\dif \zeta
+\end{equation}
+称作$f(z)$的不定积分,并且仿照高等数学中的定义引入原函数、导函数等一系列概念.
+
+对不定积分(52)求导,立即得到
+\begin{align}
+  \label{7}
+  \frac{\dif F(z)}{\dif z}=&\lim_{\Delta z\rightarrow 0}\frac{F(z+\Delta z)-F(z)}{\Delta z} \\
+  =&\frac{1}{\Delta z}\int_{z}^{z+\Delta z}f(\zeta)\dif \zeta
+\end{align}
+由于
+\begin{align}
+  \label{6}
+  \frac{1}{\Delta z}\int_{z}^{z+\Delta z}f(\zeta)\dif \zeta-f(z)=&\frac{1}{\Delta z}\int_{z}^{z+\Delta z}\left(f(\zeta)-f(z)\right)\dif \zeta \\
+  \leqslant&\frac{1}{\left| \Delta z \right| }\int_{z}^{z+\Delta z}\left| f(\zeta)-f(z) \right|\dif \zeta
+\end{align}
+当$\Delta z\rightarrow 0$时,
+\begin{equation}
+  \lim_{\Delta z\rightarrow 0}\frac{1}{\Delta z}\int_{z}^{z+\Delta z}f(\zeta)\dif \zeta=F'(z)
+\end{equation}
+并且由于$f(z)$连续,因此对任意$\epsilon>0$,必存在$\delta>0$,当$\left| \Delta z \right| =\left| z-\zeta \right| <\delta$
+时$\left| f(z)-f(\zeta) \right|<\epsilon$.代入上式可得
+\begin{align}
+  \label{5}
+  \frac{1}{\Delta z}\int_{z}^{z+\Delta z}f(\zeta)\dif \zeta-f(z)=&F'(z)-f(z) \\
+  \leqslant&\frac{1}{\Delta z}\cdot \epsilon \cdot \Delta z
+  =&\epsilon \rightarrow 0
+\end{align}
+
+\subsection{复连通区域的柯西定理}
+在实变函数积分中,如果势场存在奇点,那么绕奇点的环路积分往往不等于零.对于复变函数,保证被积函数的解析性则必须从积分区域中排除奇点.因此当欲求积分的单连通域
+中存在奇点的时候,需要将这些奇点从积分区域中挖掉,将单连通域变成复连通域.
+
+为寻找在复连通域$G$上的积分公式,我们通过作往返路径$L_{i}$连接$G$内每个"孔洞"的边界$\partial C_{i}$与$G$的边界$\partial G$,将$G$变成单连通域
+$\bar{G}$.但是在将$G$连通成单连通域时,作图可知孔洞边界的方向全部反向.然后利用单连通域上的柯西积分公式可知:
+\begin{align}
+  \label{4}
+  \oint_{\bar{G}}f(z)\dif z=&\oint_{G}f(z)\dif z+\sum_{i}\oint_{C^{-}_{i}}f(z)\dif z+\sum_{i}(\oint_{L_{i}}f(z)\dif z-\int_{\dif \partial G}f(z)\dif z) \\
+  \Rightarrow 0=&\oint_{G}f(z)\dif z+\sum_{i}\oint_{C^{-}_{i}}f(z)\dif z+0+O(\sup f(z)\dif \partial G) \\
+  \Rightarrow \oint_{G}f(z)\dif z=&\sum_{i}\oint_{C_{i}}f(z)\dif z
+\end{align}
+\begin{theorem}[复连通域上的柯西定理]
+  $\forall G$复连通域,$C_{i}$是$G$的内边界,对$G$上的解析函数$f(z)$有
+  \begin{equation}
+    \oint_{G}f(z)\dif z=\sum_{i}\oint_{C_{i}}f(z)\dif z
+  \end{equation}
+\end{theorem}
+由于每个孔洞边界可以任取,因此复连通域上的柯西积分公式可以极大简化解析函数积分的计算.接下来我们将以下一节会用到的一个重要积分为例,
+说明复连通域上柯西定理的使用方法. \\
+\textbf{算例} \\
+计算积分
+\begin{equation}
+  \oint_{C}(z-a)^{n}\dif z
+\end{equation}
+\textbf{解}
+
+首先讨论路径包含奇点$a$的情形.这时对任意闭合路径$C\supset a$,均能找到一半径为$r$,圆心为$a$的圆$G:z=re^{i\theta}+a$,使得$G\subset C$.由柯西定理可知
+\begin{align}
+  \label{3}
+  \oint_{C}(z-a)^{n}\dif z=&\oint_{G}(re^{i\theta}+a-a)^{n}\dif (re^{i\theta}+a)|_{r=\const}\\
+  =&i\int_{0}^{2\pi}e^{i(n+1)\theta}\dif\theta \\
+  =&\begin{cases}
+    0,n\not= -1 \\
+    2\pi i,n=-1
+  \end{cases}
+\end{align}
+当路径不包含奇点时,由解析函数在单连通域上的柯西定理可知积分(83)自然为零.因此,
+\begin{equation}
+  \oint_{C}(z-a)^{n}\dif z=\begin{cases}
+    0,C\not\supset a\vee (C\supset a \wedge n\not=-1) \\
+    2\pi i,C\supset a \vee n=-1
+  \end{cases}
+\end{equation}
+
+\subsection{柯西积分公式与高阶导数}
+单连通域中的柯西定理表明解析函数的实部虚部构成一个势场,复连通域中的柯西定理表明解析函数在解析区域内的环路积分只与边界形状有关,
+两者均表明解析函数在它的解析区域内各点函数值密切相关.利用上述相关性,我们可以得知解析函数在解析区域内任意一点的函数值均由且只由
+边界上的函数值确定.这一决定关系的定量描述便是柯西积分公式.
+\begin{theorem}[有界区域的柯西积分公式]
+  对单值解析函数$f(z),z\subset G$,$\partial G$分段光滑,$a\subset G$,则
+  \begin{equation}
+    f(a)=\frac{1}{2\pi i} \oint_{C} \frac{f(z)}{z-a}\dif z
+  \end{equation}
+\end{theorem}
+\textbf{证明} \\
+欲证
+\begin{equation}
+  f(a)=\frac{1}{2\pi i} \oint_{C} \frac{f(z)}{z-a}\dif z
+\end{equation}
+,只需证明对$\forall \epsilon >0$当$\left| z-a \right|<\epsilon $时,$\exists \delta >0$使得
+\begin{equation}
+  \left|\frac{1}{2\pi i} \oint_{C} \frac{f(z)}{z-a}\dif z-f(a) \right| <\delta
+\end{equation}
+利用(87)的结果可知
+\begin{equation}
+  \begin{aligned}[h]
+  f(a)=&\frac{1}{2\pi i}\oint_{G}\frac{f(a)}{z-a}\dif z \\
+  \Rightarrow \frac{1}{2\pi i} \oint_{C} \frac{f(z)}{z-a}\dif z-f(a)=&
+  \frac{1}{2\pi i} \oint_{G} \frac{f(z)}{z-a}\dif z-\frac{1}{2\pi i}\oint_{G}\frac{f(a)}{z-a}\dif z \\
+  =&\frac{1}{2\pi i}\oint_{G}\frac{f(z)-f(a)}{z-a}\dif z \\
+  \Rightarrow \left| \frac{1}{2\pi i} \oint_{G} \frac{f(z)}{z-a}\dif z-f(a) \right|=&\left| \frac{1}{2\pi i}\oint_{G}\frac{f(z)-f(a)}{z-a}\dif z \right|
+  \end{aligned}
+\end{equation}
+在$G$内作圆$C:\left| z-a \right| =r$包住奇点$z=a$,由柯西定理知
+\begin{align}
+  \label{2}
+  \frac{1}{2\pi i}\oint_{G}\frac{f(z)-f(a)}{z-a}\dif z=&\frac{1}{2\pi i}\oint_{C}\frac{f(z)-f(a)}{z-a}\dif z \\
+  \Rightarrow \left| \frac{1}{2\pi i}\oint_{G}\frac{f(z)-f(a)}{z-a}\dif z \right|\leqslant&\frac{1}{2\pi}\oint_{C}^{}\left| f(z)-f(a) \right| \frac{\left| \dif z \right| }{\left| z-a \right| } \\
+  =&\frac{1}{2\pi}\oint_{C}^{}\left| f(z)-f(a) \right|\dif \theta
+\end{align}
+当$\left| z-a \right|=r<\epsilon $时,由$f(z)$在$a$点连续知$\left| f(z)-f(a) \right|<\delta $,代入(77)知
+\begin{align}
+  \label{*}
+  \left|\frac{1}{2\pi i} \oint_{C} \frac{f(z)}{z-a}\dif z-f(a) \right|<&\frac{1}{2\pi}\oint_{C}^{}\left| f(z)-f(a) \right|\dif \theta \\
+  \leqslant&\frac{1}{2\pi}\cdot \delta 2 \cdot \pi \\
+  =&\delta
+\end{align}
+至此柯西定理得证.
+
+对于无界区域,
+\begin{equation}
+  \oint_{G=\infty}^{}\frac{\dif z}{z-a}=2\pi i
+\end{equation}
+不一定成立,因此证明柯西积分公式需要假设$f(z)$在我们作出的简单闭合围道$C$上,$C$外乃至无穷远点都单值解析.这样,我们就可以
+作大圆$a\in C_{R}\supset C$将$C$与待求的点$z=a$围住.由于路径$C$需要围住无穷远点,因此$C$的方向是顺时针方向,与围住$z=a$
+的$C_{R}$方向相反.利用有界区域上的柯西积分公式可知
+\begin{equation}
+  f(a)=\frac{1}{2\pi i}\oint_{C}^{}\frac{f(z)}{z-a}\dif z+\frac{1}{2\pi i}\oint_{C_{R}}^{}\frac{f(z)}{z-a}\dif z
+\end{equation}
+这里事实上是把$C_{R}$和$C$通过类似复连通区域柯西定理的往返路径连结成了一个单连通区域,然后再行利用单连通区域的柯西积分公式
+积分.
+
+当$R$足够大时,要让柯西积分公式仍然成立,积分结果必定与$R$的大小无关.当$\left| f(z)-0 \right|<\epsilon $时,大圆积分
+\begin{equation}
+  \begin{aligned}
+    I=\frac{1}{2\pi i}\oint_{C_{R}}^{}\frac{f(z)}{z-a}\dif z=&\frac{1}{2\pi i}\oint_{C_{R}}^{}\frac{f(z)-0}{z-a}\dif z \\
+    \Rightarrow \left| I  \right|\leqslant&\frac{1}{2\pi} \oint_{C_{R}}^{}\frac{\left| f(z)-0 \right| }{\left| z-a \right| }\left| \dif z \right| \\
+    <&\epsilon \frac{2\pi R}{R-\left| a \right| }\sim \epsilon \\
+    \Rightarrow \left| I \right|=&O(\epsilon )
+  \end{aligned}
+\end{equation}
+将(81)代入(80)得
+\begin{align}
+  \label{1}
+  f(a)=&\frac{1}{2\pi i}\oint_{C}^{}\frac{f(z)}{z-a}\dif z+O(\epsilon ) \\
+  \Rightarrow f(a)=&\frac{1}{2\pi i}\oint_{C}^{}\frac{f(z)}{z-a}\dif z
+\end{align}
+(83)即为欲证的柯西积分公式.
+\begin{theorem}[无界区域上的柯西积分公式]
+  对\textit{顺时针方向绕行}(包围无穷远点)的简单闭合围道$C$,若$f(z)$在$C$上及$C$外解析,且当$z \rightarrow \infty $时$f(z)$一致趋于0,
+  则对$C$外一点$a$,柯西积分公式
+  \begin{equation}
+    f(a)=\frac{1}{2\pi i}\oint_{C}^{}\frac{f(z)}{z-a}\dif z
+  \end{equation}
+  仍然成立.
+\end{theorem}
+
+\subsection{解析函数的任意阶导数}
+柯西积分公式(71)中仅含有自变量$a$,因此对在$G$上一致连续的解析函数$f(a)$,可以直接将求导算符与积分算符对调次序,得到$f(a)$的任意阶导数:
+\begin{align}
+  \label{9}
+  \frac{\dif^{n} f(z)}{\dif z^{n}}=&\frac{1}{2\pi i}\oint_{G}^{}(\frac{f(s)}{s-z})^{(n)}\dif s \\
+  =&\frac{n!}{2\pi i}\oint_{G}^{}\frac{f(s)}{(s-z)^{n+1}}\dif s
+\end{align}
+当然,也可以从定义的角度直接给出证明.此处我们仅需要证明一阶导数的求导公式成立,更高阶导数可以直接通过数学归纳法证明:
+\begin{equation}
+  \begin{aligned}
+    f'(z)=&\lim_{h \to 0} \frac{f(z+h)-f(z)}{h}, \\
+    \lim_{h \to 0} \frac{f(z+h)-f(z)}{h}=&\frac{1}{2\pi i} \frac{1}{h}\oint_{G}^{}\left(\frac{f(s)}{s-z-h}-\frac{f(s)}{s-z}\right)\dif s \\
+    =&\frac{1}{2\pi i}\oint_{G}^{}\frac{f(s)}{(s-z-h)(s-z)}\dif s
+  \end{aligned}
+\end{equation}
+先证明积分号下取极限的合法性.由$f(z)$在$G$上连续可知设$\left| f(s) \right|\leqslant M$在$G$上恒成立.
+设$\delta =\inf \left| z-g \right|,g\in G$,$l=\oint_{C}^{}\left| \dif g \right|$,则有
+\begin{equation}
+  \left| \oint_{G}^{}\frac{f(s)}{(s-z-h)(s-z)}\dif s-\oint_{G}^{}\frac{f(s)}{(s-z)^{2}}\dif s \right|\leqslant h\cdot\frac{Ml}{\delta^{2}(\delta-h)}\sim \frac{h}{\delta-h}
+\end{equation}
+因此
+\begin{equation}
+  \lim_{h \to 0} \frac{1}{2\pi i}\oint_{G}^{}\frac{f(s)}{(s-z-h)(s-z)}\dif s=\frac{1}{2\pi i}\oint_{G}^{}\frac{f(s)}{(s-z)^{2}}\dif s
+\end{equation}
+以此类推可得
+\begin{theorem}[解析函数的任意阶导数]
+  $\forall f(z),z \in G$,若$\forall z \in G\exists f'(z)$($\Leftrightarrow f(z)$在$G$内解析),则$f(z)$的任意阶导数均存在,并且
+  \begin{equation}
+    f^{(n)}(z)=\frac{n!}{2\pi i}\oint_{G}^{}\frac{f(s)}{(s-z)^{n+1}}\dif s
+  \end{equation}
+\end{theorem}
+
+\subsection{柯西积分公式的重要推论}
+\paragraph{Morera定理}
+对$G$中的连续函数$f(z)$,若对于任意闭合围道$C \subset  G$均有
+\begin{equation}
+  \oint_{C}^{}f(z)]\dif z=0
+\end{equation}
+则$f(z)$在$G$内解析.这个定理有时被看做柯西定理的逆定理.
+
+\paragraph{证明}
+由于$F(z)=\int_{z_{0}}^{z}f(s)\dif s$的积分值与积分路径无关,因此可以直接取积分路径为直线,然后对$F(z)$求导:
+\begin{equation}
+  \begin{aligned}
+    \left| \frac{F(z+\Delta z)-F(z)}{\Delta z}-f(z) \right|=&\frac{1}{\Delta z}\int_{z}^{z+\Delta z}(f(s)-f(z))\dif s \\
+    \leqslant&\frac{1}{\left| \Delta z \right| }\epsilon \left| \Delta z \right|
+  \end{aligned}
+\end{equation}
+因此$F(z)$的导数确实在$G$内任意一处存在,且$F(z)$的一阶导数就是$f(z)$.由于解析函数的每一阶导数都是区域内的解析函数,因此
+$F(z),f(z),f^{(n)}(z)$都在$G$内解析.
+
+Morera定理表明,对$\mathbb{R}^{2}$中的势场$\mathbf{F}(x,y),\nabla \times \mathbf{F}=0$,由这个势场构造的复势$F=F_{x}+iF_{y}$一定是一
+个解析函数,例如在求解电场分布时便会使用构造复势的方法.
+
+\paragraph{Cauchy不等式}
+对于在闭区域$G$中解析的$f(z)$,若取$I=z+re^{i\theta}\subset G$,$\sup f(z)|_{z\in I}=M$,则
+\begin{equation}
+  \left\| f^{n}(z) \right\|\leqslant\frac{n!M}{r^{n}}
+\end{equation}
+
+\paragraph{证明}
+设$f(z)$在闭区域$G$中解析,则$f(z)$在$\partial G$上连续,$\left\| f(z) \right\|$在$G$上必有上确界$M$.因而对区域内
+任意一点$z$,该点距边界最短距离为$d$,
+\begin{equation}
+  \oint_{\partial G}^{}\left| \dif z \right|=l
+\end{equation}
+\begin{equation}
+  \left\| f^{n}(z) \right\|=\frac{n!}{2\pi}\left| \oint_{\partial G}^{} \frac{f(s)}{(s-z)^{n+1}}\dif s \right|
+  \leqslant\frac{n!}{2\pi}\frac{Ml}{d^{n+1}}
+\end{equation}
+将$\partial G=z+re^{i\theta}$代入即得
+\begin{equation}
+  \frac{n!}{2\pi}\frac{Ml}{d^{n+1}}=\frac{n!M}{r^{n}}
+\end{equation}
+
+\paragraph{最大模定理}
+若$f(z)$在闭区域$G$中解析,则$\left\| f(z) \right\|$的最大值一定在$\partial G$上.
+
+\paragraph{证明}
+对于解析函数$\left| f(z) \right|^{m},m\in \mathbb{N}$,设$\sup f(z)=M$,有
+\begin{equation}
+  \begin{aligned}
+  \left| f(z) \right|^{m}\leqslant&\frac{1}{2\pi}\frac{M^{m}l}{d} \\
+  \Rightarrow \left| f(z) \right| \leqslant& M(\frac{l}{2\pi d})^{\frac{1}{m}} \\
+  \Rightarrow \left| f(z) \right| \leqslant& \lim_{m \to \infty} M(\frac{l}{2\pi d})^{\frac{1}{m}}=M
+  \end{aligned}
+\end{equation}
+
+\paragraph{Liouville定理}
+若$f(z)$在全平面解析,且在无穷远点有界,则$f(z)=\const$
+
+\paragraph{证明}
+由$f(z)=\const\Leftrightarrow f'(z)=0$,以任意有限点$z$为圆心作圆$C_{R}=z+Re^{i\theta}$.设$\sup f(z)|_{z\in C_{R}}=M_{R}$,
+由Cauchy不等式有
+\begin{equation}
+  \left| f'(z) \right|\leqslant\frac{M_{R}}{R}
+\end{equation}
+由于$z\rightarrow \infty $时$\left| f(z) \right|$有界,因此$R\rightarrow\infty$时$M_{R}$有界,
+\begin{equation}
+  \lim_{R \to \infty} \frac{M_{R}}{R}=0
+\end{equation}
+因而
+\begin{equation}
+  \left| f'(z) \right|=0,即f'(z)=0
+\end{equation}
+
+\textit{注:Liouville定理在分母次数不同时有很多种推论,这些推论都可以用拆部分分式的方法证明}
+
+\paragraph{均值定理}
+解析函数\(f(z)\)在解析区域内任意一点\(a\)的函数值\(f(a)\),等于以\(a\)为圆心且完全位于解析区域内的任意圆周上的
+函数值的平均.
+\begin{equation}
+  f(a)=\frac{1}{2\pi}\int_{0}^{2\pi}f(a+Re^{i\theta})\dif \theta
+\end{equation}
+
+\paragraph{证明}
+直接将\(C:z=a+Re^{i\theta}\)代入柯西积分公式中即可.
+
+\paragraph{圆弧引理}
+设\(f(z)\)在\(\infty\)点的邻域内连续,当\(\theta_{1}\leqslant\arg z\leqslant\theta_{2}\),
+\(z\rightarrow\infty\)时,\(zf(z)\)一致地趋近于\(K\),则有
+\begin{equation}
+  \lim_{R \to \infty}\int_{C_{R}}^{}f(z)\dif z=iK(\theta_{2}-\theta_{1})
+\end{equation}
+其中\(C_{R}\)是绕\(\infty\)的大圆\(z=Re^{i\theta}\)上,夹角\(\theta_{2}-\theta_{1}\)的一段圆弧,\(\left| z \right| =R\).
+
+\paragraph{证明}
+类似柯西积分公式,这里同样设法证明
+\begin{equation}
+  \lim_{R \to \infty} \left|\int_{C_R}^{}f(z)\dif z-iK(\theta_{2}-\theta_{1}) \right|=0
+\end{equation}
+由
+\begin{equation}
+  \int_{C_{R}}^{}\frac{\dif z}{z}=i(\theta_{2}-\theta_{1})
+\end{equation}
+可知,
+% todo 例题和练习题
+% todo 补充圆弧引理,柯西不等式,最大模定理等重要定理
+\end{document}
